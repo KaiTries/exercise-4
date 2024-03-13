@@ -4,6 +4,12 @@ import cartago.Artifact;
 import cartago.OPERATION;
 import cartago.OpFeedbackParam;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
 /**
  * A CArtAgO artifact that agent can use to interact with LDP containers in a Solid pod.
  */
@@ -29,7 +35,17 @@ public class Pod extends Artifact {
    */
     @OPERATION
     public void createContainer(String containerName) {
-        log("1. Implement the method createContainer()");
+        var containerUrl = podURL + "/" + containerName + "/";
+        HttpClient client = HttpClient.newHttpClient();
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(containerUrl))
+                .PUT(HttpRequest.BodyPublishers.noBody())
+                .build();
+        try {
+            client.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
   /**
@@ -41,7 +57,20 @@ public class Pod extends Artifact {
    */
     @OPERATION
     public void publishData(String containerName, String fileName, Object[] data) {
-        log("2. Implement the method publishData()");
+        var containerUrl = podURL + "/" + containerName + "/";
+        var fileUrl = containerUrl + fileName;
+        log("Publishing data to: " + fileUrl);
+        HttpClient client = HttpClient.newHttpClient();
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(fileUrl))
+                .header("Content-Type", "text/plain")
+                .PUT(HttpRequest.BodyPublishers.ofString(createStringFromArray(data)))
+                .build();
+        try {
+            client.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
   /**
@@ -64,23 +93,18 @@ public class Pod extends Artifact {
    * @return An array whose elements are the data read from the .txt file
    */
     public Object[] readData(String containerName, String fileName) {
-        log("3. Implement the method readData(). Currently, the method returns mock data");
-
-        // Remove the following mock responses once you have implemented the method
-        switch(fileName) {
-            case "watchlist.txt":
-                Object[] mockWatchlist = new Object[]{"The Matrix", "Inception", "Avengers: Endgame"};
-                return mockWatchlist;
-            case "sleep.txt":
-                Object[] mockSleepData = new Object[]{"6", "7", "5"};
-                return mockSleepData;
-            case "trail.txt":
-                Object[] mockTrailData = new Object[]{"3", "5.5", "5.5"};
-                return mockTrailData; 
-            default:
-                return new Object[0];
+        var fileUrl = podURL + "/" + containerName + "/" + fileName;
+        HttpClient client = HttpClient.newHttpClient();
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(fileUrl))
+                .GET()
+                .build();
+        try {
+            var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            return createArrayFromString(response.body());
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
         }
-
     }
 
   /**
