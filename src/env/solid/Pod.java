@@ -25,7 +25,7 @@ public class Pod extends Artifact {
     public void init(String podURL) {
         this.podURL = podURL;
         log("Pod artifact initialized for: " + this.podURL);
-    }
+    } 
 
   /**
    * CArtAgO operation for creating a Linked Data Platform container in the Solid pod
