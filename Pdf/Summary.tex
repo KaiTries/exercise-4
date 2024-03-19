@@ -7,6 +7,7 @@
 \usepackage{hyperref} % For hyperlinks
 \usepackage{graphicx} % For including images
 \usepackage{listings}
+\usepackage{textcomp}
 
 \usepackage{xcolor} % Required for setting custom colors
 
@@ -35,7 +36,7 @@
 \section*{Task 1: Take part to a decentralised social network}
 \subsection*{Task 1.1: Update your FOAF Profile}
 The Url to my Card: \href{https://wiser-solid-xi.interactions.ics.unisg.ch/kai/profile/card#me}{/kai/card\#me} \\
-I added my Name and my mail address additionally to adding you and Jonas as people that I know.
+I added my Name and my mail address and you and Jonas as people that I know.
 \begin{lstlisting}
 @prefix foaf: <http://xmlns.com/foaf/0.1/>.
 @prefix solid: <http://www.w3.org/ns/solid/terms#>.
@@ -67,7 +68,7 @@ comunica-sparql https://wiser-solid-xi.interactions.ics.unisg.ch/kai/profile/car
        <https://wiser-solid-xi.interactions.ics.unisg.ch/kai/profile/card#me> foaf:knows ?person.
      }"    
 \end{lstlisting}
-
+The above sparql query searches through all triples on the specified Iri (my profile card). The specified triple that were looking for is: \textless MyWebID\textgreater \textless foaf:knows\textgreater \textless Any Person\textgreater. That is what we did in the above query. From this query we select all distinct people we get.
 \subsubsection*{1. Query the names of all people interconnected in the distributed social graph}
 \begin{lstlisting}
 comunica-sparql-link-traversal-solid --idp https://wiser-solid-xi.interactions.ics.unisg.ch/\
@@ -77,6 +78,7 @@ WHERE {
   <https://wiser-solid-xi.interactions.ics.unisg.ch/kai/profile/card#me> (foaf:knows|^foaf:knows)+ ?person.
 }" --lenient 
 \end{lstlisting}
+In the above query we 
 \section*{Task 2: Build an application for your Solid pod}
 All the code for the task can be found on Github: \href{https://github.com/KaiTries/exercise-4/blob/main/src/env/solid/Pod.java}{/src/env/solid/Pod.java}\\
 Code should be executed as described in the Exercise  description.
