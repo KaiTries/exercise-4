@@ -58,27 +58,40 @@ I added my Name and my mail address and you and Jonas as people that I know.
 \end{lstlisting}
 
 \subsection*{Task 1.2: Query the distributed social graph}
-Both queries can be copy pasted into the terminal and executed as is if you have the necessary command line tools.
+Both queries can also be found as sparql files on Github: \href{https://github.com/KaiTries/exercise-4/blob/main/sparqlNoTraversal.sparql}{nonTraversal} | \href{https://github.com/KaiTries/exercise-4/blob/main/sparqlLinkTraversal.sparql}{Traversal}.\\Use the cli commands comunica-sparql or comunica-sparql-link-traversal
 \subsubsection*{1. Query the people you know based on your FOAF profile}
 \begin{lstlisting}
-comunica-sparql https://wiser-solid-xi.interactions.ics.unisg.ch/kai/profile/card#me \
-    "PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-     SELECT DISTINCT ?person
-     WHERE {
-       <https://wiser-solid-xi.interactions.ics.unisg.ch/kai/profile/card#me> foaf:knows ?person.
-     }"    
+"PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+SELECT DISTINCT ?person
+WHERE {
+ <https://wiser-solid-xi.interactions.ics.unisg.ch/kai/profile/card#me> foaf:knows ?person.
+}
 \end{lstlisting}
 The above sparql query searches through all triples on the specified Iri (my profile card). The specified triple that were looking for is: \textless MyWebID\textgreater \textless foaf:knows\textgreater \textless Any Person\textgreater. That is what we did in the above query. From this query we select all distinct people we get.
 \subsubsection*{1. Query the names of all people interconnected in the distributed social graph}
 \begin{lstlisting}
-comunica-sparql-link-traversal-solid --idp https://wiser-solid-xi.interactions.ics.unisg.ch/\
-  "PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-SELECT DISTINCT ?person
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+SELECT DISTINCT ?name
 WHERE {
   <https://wiser-solid-xi.interactions.ics.unisg.ch/kai/profile/card#me> (foaf:knows|^foaf:knows)+ ?person.
-}" --lenient 
+  ?person (foaf:name|foaf:firstName|foaf:givenName|foaf:nickName)+ ?name.
+}
 \end{lstlisting}
-In the above query we 
+In the above query we use the \href{https://www.w3.org/TR/sparql11-query/\#propertypaths}{property paths} to query through the graph. The Comunica Link Traversal engine enables us to go through the external nodes and that is how we can crawl  through the entire social graph.\\
+While the same syntax is still possible without the link traversal we will in our case not be able to profit from it, since we do not execute any http requests to the found persons. If there were transitive relationships on on graph, so e.g.:\\
+a owl:sameas :b.\\
+:b owl:sameas :c.\\
+We could do:
+\begin{lstlisting}
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+SELECT *
+WHERE
+{
+  ?x owl:sameAs+ ?y
+}
+\end{lstlisting}
+This is an exampele of how a navigational query could be used on a single graph. So all in all there is no difference in syntax between the two queries since they are both just sparql. The executed HTTP requests differ, since one cli command can traverse link and the other cant. So executing it with comunica-sparql will result in 1 HTTP request and executing it with comunica-sparql-link-traversal will result in querying the entire reachable graph.
+
 \section*{Task 2: Build an application for your Solid pod}
 All the code for the task can be found on Github: \href{https://github.com/KaiTries/exercise-4/blob/main/src/env/solid/Pod.java}{/src/env/solid/Pod.java}\\
 Code should be executed as described in the Exercise  description.
