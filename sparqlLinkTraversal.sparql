@@ -4,7 +4,7 @@ SELECT DISTINCT ?name
 WHERE {
   SELECT ?person ?name
   WHERE {
-    <https://wiser-solid-xi.interactions.ics.unisg.ch/kai/profile/card#me> foaf:knows* ?person.
+    <https://wiser-solid-xi.interactions.ics.unisg.ch/kai/profile/card#me> (foaf:knows|^foaf:knows)+ ?person.
     ?person (foaf:name|foaf:firstName|foaf:givenName|foaf:nickName)+ ?name.
   }  
 }" --lenient
