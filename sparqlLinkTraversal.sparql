@@ -2,12 +2,9 @@ comunica-sparql-link-traversal-solid --idp https://wiser-solid-xi.interactions.i
   "PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 SELECT DISTINCT ?name
 WHERE {
-  <https://wiser-solid-xi.interactions.ics.unisg.ch/kai/profile/card#me> foaf:knows* ?person.
-  {
-    ?person foaf:name ?name.
-  } UNION {
-    ?person foaf:firstName ?name.
-  } UNION {
-    ?person foaf:givenName ?name.
-  }
+  SELECT ?person ?name
+  WHERE {
+    <https://wiser-solid-xi.interactions.ics.unisg.ch/kai/profile/card#me> foaf:knows* ?person.
+    ?person (foaf:name|foaf:firstName|foaf:givenName|foaf:nickName)+ ?name.
+  }  
 }" --lenient
